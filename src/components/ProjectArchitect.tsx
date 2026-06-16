@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateProjectProposals, ProjectProposal } from '../lib/llm';
+import { generateProjectProposals, type ProjectProposal } from '../lib/llm';
 import { useStore } from '../store/useStore';
 import { supabase } from '../lib/supabase';
 import { Loader2, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';

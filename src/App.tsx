@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ProjectArchitect } from './components/ProjectArchitect';
 import { KanbanDashboard } from './components/KanbanDashboard';
 import { Auth } from './components/Auth';

@@ -54,8 +54,8 @@ Inputs:
 
 export async function expandTask(apiKey: string, taskTitle: string, taskDescription: string): Promise<string> {
   const systemPrompt = `You are an expert technical project architect for engineering students.
-The student has a task: "\${taskTitle}"
-Current details: "\${taskDescription}"
+The student has a task: "${taskTitle}"
+Current details: "${taskDescription}"
 
 Generate a short, actionable checklist of 3-5 sub-tasks or implementation steps to accomplish this task.
 Return the result as a raw markdown checklist, e.g.:
@@ -68,7 +68,7 @@ Return the result as a raw markdown checklist, e.g.:
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer \${apiKey}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: 'gpt-4o',

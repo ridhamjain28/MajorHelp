@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/useStore';
 import { expandTask } from '../lib/llm';
-import { Sparkles, Clock, CheckCircle, Circle, PlayCircle, Loader2 } from 'lucide-react';
+import { Sparkles, CheckCircle, Circle, PlayCircle, Loader2 } from 'lucide-react';
 
 interface Project {
   id: string;
