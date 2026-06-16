@@ -94,6 +94,12 @@ CREATE POLICY "Authenticated users can create teams"
     TO authenticated
     WITH CHECK (true);
 
+-- Function to check if user is owner of team
+CREATE OR REPLACE FUNCTION public.get_user_owned_teams()
+RETURNS SETOF UUID AS $$
+  SELECT team_id FROM public.team_members WHERE user_id = auth.uid() AND role = 'owner';
+$$ LANGUAGE sql SECURITY DEFINER;
+
 -- RLS Policies for team_members
 CREATE POLICY "Users can view members of their teams"
     ON public.team_members FOR SELECT
@@ -102,9 +108,21 @@ CREATE POLICY "Users can view members of their teams"
 CREATE POLICY "Team owners can insert members"
     ON public.team_members FOR INSERT
     TO authenticated
-    WITH CHECK (
-        EXISTS (SELECT 1 FROM public.team_members tm WHERE tm.team_id = team_members.team_id AND tm.user_id = auth.uid() AND tm.role = 'owner')
-    );
+    WITH CHECK ( team_id IN (SELECT public.get_user_owned_teams()) );
+
+-- Trigger to add creator as owner
+CREATE OR REPLACE FUNCTION public.handle_new_team() 
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.team_members (team_id, user_id, role)
+  VALUES (NEW.id, auth.uid(), 'owner');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_team_created
+  AFTER INSERT ON public.teams
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_team();
 
 -- RLS Policies for team_join_requests
 CREATE POLICY "Users can insert their own join requests" 

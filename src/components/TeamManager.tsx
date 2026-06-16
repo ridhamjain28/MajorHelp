@@ -53,13 +53,6 @@ export const TeamManager: React.FC = () => {
         
       if (error) throw error;
       
-      // IMPORTANT: Insert the creator into team_members as owner
-      const { error: memberError } = await supabase
-        .from('team_members')
-        .insert({ team_id: newTeamId, user_id: user.id, role: 'owner' });
-
-      if (memberError) throw memberError;
-
       const newTeam = { id: newTeamId, name: newTeamName, join_code: code };
       setTeams([...teams, newTeam]);
       setNewTeamName('');
