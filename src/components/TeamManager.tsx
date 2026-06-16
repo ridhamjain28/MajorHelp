@@ -55,9 +55,9 @@ export const TeamManager: React.FC = () => {
         setNewTeamName('');
         setActiveTeamId(data.id);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create team:', err);
-      alert('Failed to create team.');
+      alert('Failed to create team. Error: ' + (err?.message || JSON.stringify(err)));
     } finally {
       setCreating(false);
     }

@@ -1,3 +1,9 @@
+-- Drop existing tables to start fresh (WARNING: This will delete existing project data)
+DROP TABLE IF EXISTS public.tasks CASCADE;
+DROP TABLE IF EXISTS public.projects CASCADE;
+DROP TABLE IF EXISTS public.team_members CASCADE;
+DROP TABLE IF EXISTS public.teams CASCADE;
+
 -- Create tables
 CREATE TABLE public.teams (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
