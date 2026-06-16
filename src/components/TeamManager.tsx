@@ -53,7 +53,6 @@ export const TeamManager: React.FC = () => {
       if (data) {
         setTeams([...teams, data]);
         setNewTeamName('');
-        // Automatically select the newly created team
         setActiveTeamId(data.id);
       }
     } catch (err) {
@@ -66,57 +65,62 @@ export const TeamManager: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center mt-20">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+      <div className="flex justify-center mt-32">
+        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-12 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-      <div className="text-center mb-10">
-        <Users className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-        <h2 className="text-3xl font-bold text-gray-900">Your Workspaces</h2>
-        <p className="text-gray-500 mt-2">Select a team to continue, or create a new one.</p>
+    <div className="max-w-2xl mx-auto mt-12 glass-panel p-10 rounded-2xl relative overflow-hidden">
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
+      
+      <div className="text-center mb-12">
+        <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800/80 mx-auto flex items-center justify-center mb-6 shadow-xl relative">
+          <div className="absolute inset-0 bg-indigo-500/20 rounded-2xl blur-xl"></div>
+          <Users className="w-8 h-8 text-zinc-100 relative z-10" />
+        </div>
+        <h2 className="text-3xl font-bold text-zinc-100 tracking-tight">Your Workspaces</h2>
+        <p className="text-zinc-400 mt-2 text-sm">Select a team to continue, or create a new one.</p>
       </div>
 
       {teams.length > 0 ? (
-        <div className="space-y-4 mb-10">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500">Available Teams</h3>
+        <div className="space-y-3 mb-12">
+          <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 ml-1 mb-4">Available Teams</h3>
           {teams.map(team => (
             <button
               key={team.id}
               onClick={() => setActiveTeamId(team.id)}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-lg transition-all group"
+              className="w-full flex items-center justify-between p-4 bg-zinc-900/40 hover:bg-zinc-800/60 border border-zinc-800 hover:border-indigo-500/40 rounded-xl transition-all duration-300 group"
             >
-              <span className="font-semibold text-gray-800 group-hover:text-blue-700">{team.name}</span>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
+              <span className="font-medium text-zinc-200 group-hover:text-white">{team.name}</span>
+              <ArrowRight className="w-5 h-5 text-zinc-600 group-hover:text-indigo-400 transition-colors" />
             </button>
           ))}
         </div>
       ) : (
-        <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200 mb-10">
-          <p className="text-gray-600">You don't belong to any teams yet.</p>
+        <div className="text-center p-8 bg-zinc-900/30 rounded-xl border border-zinc-800/50 mb-12">
+          <p className="text-zinc-500 text-sm">You don't belong to any teams yet.</p>
         </div>
       )}
 
-      <form onSubmit={handleCreateTeam} className="bg-blue-50/50 p-6 rounded-lg border border-blue-100">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-blue-600 mb-4">Create New Team</h3>
-        <div className="flex gap-4">
+      <form onSubmit={handleCreateTeam} className="bg-zinc-900/30 p-6 rounded-xl border border-zinc-800/50">
+        <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 mb-4">Create New Team</h3>
+        <div className="flex gap-3">
           <input
             type="text"
             value={newTeamName}
             onChange={(e) => setNewTeamName(e.target.value)}
-            className="flex-1 px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="flex-1 px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 text-zinc-100 placeholder-zinc-600 outline-none transition-all text-sm"
             placeholder="e.g., Capstone Group 4"
             required
           />
           <button
             type="submit"
             disabled={creating}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
+            className="px-6 py-2.5 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-70 text-sm"
           >
-            {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+            {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Create
           </button>
         </div>

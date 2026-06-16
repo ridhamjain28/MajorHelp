@@ -35,7 +35,6 @@ export const KanbanDashboard: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch projects for team
       const { data: projData, error: projError } = await supabase
         .from('projects')
         .select('*')
@@ -44,7 +43,6 @@ export const KanbanDashboard: React.FC = () => {
       if (projError) throw projError;
       setProjects(projData || []);
 
-      // If we have projects, fetch their tasks
       if (projData && projData.length > 0) {
         const projectIds = projData.map(p => p.id);
         const { data: taskData, error: taskError } = await supabase
@@ -63,14 +61,8 @@ export const KanbanDashboard: React.FC = () => {
   };
 
   const handleStatusChange = async (taskId: string, newStatus: Task['status']) => {
-    // Optimistic update
     setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
-    
-    // DB update
-    await supabase
-      .from('tasks')
-      .update({ status: newStatus })
-      .eq('id', taskId);
+    await supabase.from('tasks').update({ status: newStatus }).eq('id', taskId);
   };
 
   const handleAIExpand = async (task: Task) => {
@@ -85,14 +77,9 @@ export const KanbanDashboard: React.FC = () => {
       const generatedChecklist = await expandTask(apiKey, task.title, task.description || "");
       const newDescription = `${task.description || ''}\n\n**AI Implementation Plan:**\n${generatedChecklist}`.trim();
       
-      // Update local state
       setTasks(tasks.map(t => t.id === task.id ? { ...t, description: newDescription } : t));
       
-      // Update DB
-      await supabase
-        .from('tasks')
-        .update({ description: newDescription })
-        .eq('id', task.id);
+      await supabase.from('tasks').update({ description: newDescription }).eq('id', task.id);
     } catch (err) {
       console.error(err);
       alert("Failed to expand task with AI");
@@ -101,54 +88,51 @@ export const KanbanDashboard: React.FC = () => {
     }
   };
 
-  // Passive Timeline Tracker calculation
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.status === 'done').length;
   const progressPercent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
-  const renderColumn = (status: Task['status'], title: string, icon: React.ReactNode, bgColor: string) => {
+  const renderColumn = (status: Task['status'], title: string, icon: React.ReactNode, borderColor: string, iconColor: string) => {
     const colTasks = tasks.filter(t => t.status === status);
     
     return (
-      <div className={`flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm h-full`}>
-        <div className={`flex items-center gap-2 p-4 border-b border-gray-100 ${bgColor}`}>
-          {icon}
-          <h3 className="font-semibold text-gray-800">{title}</h3>
-          <span className="ml-auto bg-white/60 text-gray-600 text-xs py-0.5 px-2 rounded-full font-medium">
+      <div className="flex flex-col bg-zinc-900/40 rounded-2xl border border-zinc-800/60 overflow-hidden backdrop-blur-sm h-full">
+        <div className={`flex items-center gap-3 p-5 border-b border-zinc-800/60 bg-zinc-900/80`}>
+          <div className={iconColor}>{icon}</div>
+          <h3 className="font-bold text-zinc-200 tracking-tight">{title}</h3>
+          <span className="ml-auto bg-zinc-800 text-zinc-400 text-xs py-1 px-2.5 rounded-full font-mono font-medium">
             {colTasks.length}
           </span>
         </div>
         
-        <div className="p-4 flex-1 overflow-y-auto space-y-4 bg-gray-50/50">
+        <div className="p-4 flex-1 overflow-y-auto space-y-4">
           {colTasks.map(task => (
-            <div key={task.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="text-xs text-blue-600 font-semibold mb-1">
+            <div key={task.id} className="bg-zinc-950/80 p-5 rounded-xl border border-zinc-800/80 hover:border-zinc-700 hover:-translate-y-0.5 transition-all duration-300 shadow-sm group">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-indigo-400/80 mb-2">
                 {projects.find(p => p.id === task.project_id)?.name}
               </div>
-              <h4 className="font-bold text-gray-900 mb-2">{task.title}</h4>
+              <h4 className="font-semibold text-zinc-100 mb-2 leading-snug">{task.title}</h4>
               {task.description && (
-                <div className="text-sm text-gray-600 mb-4 whitespace-pre-wrap line-clamp-4">
+                <div className="text-xs text-zinc-400 mb-4 whitespace-pre-wrap line-clamp-4 leading-relaxed">
                   {task.description}
                 </div>
               )}
               
-              <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-100">
-                <div className="flex items-center gap-2">
-                  <select 
-                    value={task.status}
-                    onChange={(e) => handleStatusChange(task.id, e.target.value as Task['status'])}
-                    className="text-xs border border-gray-200 rounded-md p-1.5 bg-gray-50 outline-none flex-1"
-                  >
-                    <option value="todo">To Do</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="done">Done</option>
-                  </select>
-                </div>
+              <div className="flex flex-col gap-3 mt-5 pt-4 border-t border-zinc-800/60">
+                <select 
+                  value={task.status}
+                  onChange={(e) => handleStatusChange(task.id, e.target.value as Task['status'])}
+                  className="text-xs border border-zinc-800 rounded-lg p-2 bg-zinc-900 text-zinc-300 outline-none w-full hover:border-zinc-700 transition-colors cursor-pointer appearance-none"
+                >
+                  <option value="todo">To Do</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
                 
                 <button
                   onClick={() => handleAIExpand(task)}
                   disabled={expandingTaskId === task.id}
-                  className="flex items-center justify-center gap-1.5 w-full py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-semibold rounded-md border border-purple-200 transition-colors disabled:opacity-50"
+                  className="relative overflow-hidden flex items-center justify-center gap-1.5 w-full py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-bold rounded-lg border border-indigo-500/20 transition-all disabled:opacity-50 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.1)]"
                 >
                   {expandingTaskId === task.id ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -161,7 +145,7 @@ export const KanbanDashboard: React.FC = () => {
             </div>
           ))}
           {colTasks.length === 0 && (
-            <div className="text-center py-8 text-gray-400 text-sm italic">
+            <div className="text-center py-12 text-zinc-600 text-sm italic">
               No tasks here
             </div>
           )}
@@ -171,46 +155,43 @@ export const KanbanDashboard: React.FC = () => {
   };
 
   if (!activeTeamId) {
-    return (
-      <div className="text-center p-12 bg-white rounded-xl shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-800 mb-2">No Active Team Workspace</h2>
-        <p className="text-gray-500">Please select or create a team to view your Kanban dashboard.</p>
-      </div>
-    );
+    return null;
   }
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in">
       {/* Passive Timeline Tracker */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <div className="flex justify-between items-end mb-2">
+      <div className="glass-panel p-6 rounded-2xl">
+        <div className="flex justify-between items-end mb-4">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Semester Progress Tracker</h2>
-            <p className="text-sm text-gray-500">Based on task completion across all projects</p>
+            <h2 className="text-xl font-bold text-zinc-100 tracking-tight">Semester Progress</h2>
+            <p className="text-sm text-zinc-400 mt-1">Based on task completion across all projects</p>
           </div>
-          <div className="text-2xl font-bold text-blue-600">{progressPercent}%</div>
+          <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">
+            {progressPercent}%
+          </div>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+        <div className="w-full bg-zinc-900 rounded-full h-3 border border-zinc-800 overflow-hidden relative">
           <div 
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-1000 ease-out"
+            className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(99,102,241,0.5)]"
             style={{ width: `${progressPercent}%` }}
           ></div>
         </div>
       </div>
 
       {/* Kanban Board */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[800px]">
-        {renderColumn('todo', 'To Do', <Circle className="w-5 h-5 text-gray-500" />, 'bg-gray-50')}
-        {renderColumn('in_progress', 'In Progress', <PlayCircle className="w-5 h-5 text-blue-500" />, 'bg-blue-50')}
-        {renderColumn('done', 'Done', <CheckCircle className="w-5 h-5 text-green-500" />, 'bg-green-50')}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[750px]">
+        {renderColumn('todo', 'To Do', <Circle className="w-5 h-5" />, 'border-zinc-500', 'text-zinc-500')}
+        {renderColumn('in_progress', 'In Progress', <PlayCircle className="w-5 h-5" />, 'border-indigo-500', 'text-indigo-500')}
+        {renderColumn('done', 'Done', <CheckCircle className="w-5 h-5" />, 'border-emerald-500', 'text-emerald-500')}
       </div>
     </div>
   );

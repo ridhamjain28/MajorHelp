@@ -40,28 +40,36 @@ export const Auth: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+    <div className="w-full max-w-md mx-auto glass-panel p-8 rounded-2xl relative overflow-hidden">
+      {/* Subtle top glow */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
+
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
-        <p className="text-gray-500 mt-2">{isLogin ? 'Sign in to access your workspaces' : 'Sign up to start tracking projects'}</p>
+        <h2 className="text-2xl font-bold text-zinc-100 tracking-tight">
+          {isLogin ? 'Welcome Back' : 'Create Account'}
+        </h2>
+        <p className="text-sm text-zinc-400 mt-2">
+          {isLogin ? 'Sign in to access your workspaces' : 'Sign up to start tracking projects'}
+        </p>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 text-red-700 text-sm rounded-md">
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
           {error}
         </div>
       )}
 
       <form onSubmit={handleAuth} className="space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Email</label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/50 border border-zinc-800 rounded-lg focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 text-zinc-100 placeholder-zinc-600 outline-none transition-all text-sm"
               placeholder="you@university.edu"
               required
             />
@@ -69,14 +77,14 @@ export const Auth: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Password</label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/50 border border-zinc-800 rounded-lg focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 text-zinc-100 placeholder-zinc-600 outline-none transition-all text-sm"
               placeholder="••••••••"
               required
             />
@@ -86,24 +94,24 @@ export const Auth: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
+          className="w-full py-2.5 bg-zinc-100 hover:bg-white text-zinc-900 font-bold text-sm rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-70 mt-2"
         >
-          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLogin ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />)}
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isLogin ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />)}
           {isLogin ? 'Sign In' : 'Sign Up'}
         </button>
       </form>
 
-      <div className="mt-6 flex items-center justify-between">
-        <hr className="w-full border-gray-200" />
-        <span className="px-4 text-xs text-gray-500 uppercase tracking-wider">or</span>
-        <hr className="w-full border-gray-200" />
+      <div className="mt-8 flex items-center justify-between">
+        <hr className="w-full border-zinc-800" />
+        <span className="px-4 text-xs text-zinc-500 uppercase tracking-widest font-medium">or</span>
+        <hr className="w-full border-zinc-800" />
       </div>
 
       <button
         onClick={handleGoogleAuth}
-        className="mt-6 w-full py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-md flex items-center justify-center gap-2 transition-colors"
+        className="mt-8 w-full py-2.5 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-medium text-sm rounded-lg flex items-center justify-center gap-3 transition-colors"
       >
-        <svg className="w-5 h-5" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-zinc-100" viewBox="0 0 24 24">
           <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
           <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
           <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -112,9 +120,9 @@ export const Auth: React.FC = () => {
         Continue with Google
       </button>
 
-      <p className="mt-8 text-center text-sm text-gray-600">
+      <p className="mt-8 text-center text-sm text-zinc-500">
         {isLogin ? "Don't have an account? " : "Already have an account? "}
-        <button onClick={() => setIsLogin(!isLogin)} className="text-blue-600 font-semibold hover:underline">
+        <button onClick={() => setIsLogin(!isLogin)} className="text-zinc-300 font-semibold hover:text-white transition-colors">
           {isLogin ? 'Sign up' : 'Sign in'}
         </button>
       </p>
