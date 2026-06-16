@@ -24,6 +24,11 @@ export const KanbanDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [expandingTaskId, setExpandingTaskId] = useState<string | null>(null);
 
+  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskDescription, setNewTaskDescription] = useState('');
+  const [newTaskProjectId, setNewTaskProjectId] = useState('');
+
   useEffect(() => {
     if (activeTeamId) {
       fetchData();
@@ -44,6 +49,7 @@ export const KanbanDashboard: React.FC = () => {
       setProjects(projData || []);
 
       if (projData && projData.length > 0) {
+        setNewTaskProjectId(projData[0].id); // default selection
         const projectIds = projData.map(p => p.id);
         const { data: taskData, error: taskError } = await supabase
           .from('tasks')
@@ -63,6 +69,35 @@ export const KanbanDashboard: React.FC = () => {
   const handleStatusChange = async (taskId: string, newStatus: Task['status']) => {
     setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
     await supabase.from('tasks').update({ status: newStatus }).eq('id', taskId);
+  };
+
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTaskTitle.trim() || !newTaskProjectId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert({
+          project_id: newTaskProjectId,
+          title: newTaskTitle,
+          description: newTaskDescription,
+          status: 'todo'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setTasks([...tasks, data]);
+      }
+      setIsNewTaskModalOpen(false);
+      setNewTaskTitle('');
+      setNewTaskDescription('');
+    } catch (err) {
+      console.error('Failed to create task:', err);
+      alert('Failed to create task');
+    }
   };
 
   const handleAIExpand = async (task: Task) => {
@@ -97,12 +132,24 @@ export const KanbanDashboard: React.FC = () => {
     
     return (
       <div className="flex flex-col bg-zinc-900/40 rounded-2xl border border-zinc-800/60 overflow-hidden backdrop-blur-sm h-full">
-        <div className={`flex items-center gap-3 p-5 border-b border-zinc-800/60 bg-zinc-900/80`}>
-          <div className={iconColor}>{icon}</div>
-          <h3 className="font-bold text-zinc-200 tracking-tight">{title}</h3>
-          <span className="ml-auto bg-zinc-800 text-zinc-400 text-xs py-1 px-2.5 rounded-full font-mono font-medium">
-            {colTasks.length}
-          </span>
+        <div className={`flex items-center justify-between p-5 border-b border-zinc-800/60 bg-zinc-900/80`}>
+          <div className="flex items-center gap-3">
+            <div className={iconColor}>{icon}</div>
+            <h3 className="font-bold text-zinc-200 tracking-tight">{title}</h3>
+          </div>
+          <div className="flex items-center gap-2">
+            {status === 'todo' && projects.length > 0 && (
+              <button 
+                onClick={() => setIsNewTaskModalOpen(true)}
+                className="text-xs bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 rounded-md transition-colors font-bold"
+              >
+                + Add
+              </button>
+            )}
+            <span className="bg-zinc-800 text-zinc-400 text-xs py-1 px-2.5 rounded-full font-mono font-medium">
+              {colTasks.length}
+            </span>
+          </div>
         </div>
         
         <div className="p-4 flex-1 overflow-y-auto space-y-4">
@@ -167,7 +214,7 @@ export const KanbanDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in relative">
       {/* Passive Timeline Tracker */}
       <div className="glass-panel p-6 rounded-2xl">
         <div className="flex justify-between items-end mb-4">
@@ -193,6 +240,52 @@ export const KanbanDashboard: React.FC = () => {
         {renderColumn('in_progress', 'In Progress', <PlayCircle className="w-5 h-5" />, 'text-indigo-500')}
         {renderColumn('done', 'Done', <CheckCircle className="w-5 h-5" />, 'text-emerald-500')}
       </div>
+
+      {/* New Task Modal */}
+      {isNewTaskModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl p-6">
+            <h3 className="text-xl font-bold text-zinc-100 mb-6">Create New Task</h3>
+            <form onSubmit={handleCreateTask} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Project</label>
+                <select 
+                  value={newTaskProjectId}
+                  onChange={(e) => setNewTaskProjectId(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 outline-none text-sm"
+                  required
+                >
+                  {projects.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Task Title</label>
+                <input 
+                  type="text"
+                  value={newTaskTitle}
+                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 outline-none text-sm focus:border-indigo-500/50"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Description</label>
+                <textarea 
+                  value={newTaskDescription}
+                  onChange={(e) => setNewTaskDescription(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-100 outline-none text-sm min-h-[100px] focus:border-indigo-500/50"
+                />
+              </div>
+              <div className="flex gap-3 justify-end pt-4 border-t border-zinc-800">
+                <button type="button" onClick={() => setIsNewTaskModalOpen(false)} className="px-4 py-2 text-zinc-400 hover:text-white text-sm font-medium">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-bold">Create Task</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
