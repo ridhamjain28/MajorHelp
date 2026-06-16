@@ -51,3 +51,41 @@ Inputs:
     throw error;
   }
 }
+
+export async function expandTask(apiKey: string, taskTitle: string, taskDescription: string): Promise<string> {
+  const systemPrompt = `You are an expert technical project architect for engineering students.
+The student has a task: "\${taskTitle}"
+Current details: "\${taskDescription}"
+
+Generate a short, actionable checklist of 3-5 sub-tasks or implementation steps to accomplish this task.
+Return the result as a raw markdown checklist, e.g.:
+- [ ] Sub-task 1
+- [ ] Sub-task 2
+`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer \${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{ role: 'system', content: systemPrompt }],
+        temperature: 0.7,
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'Failed to expand task');
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error("LLM Expand Task Error:", error);
+    throw error;
+  }
+}
