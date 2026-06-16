@@ -83,7 +83,7 @@ export const KanbanDashboard: React.FC = () => {
     setExpandingTaskId(task.id);
     try {
       const generatedChecklist = await expandTask(apiKey, task.title, task.description || "");
-      const newDescription = \`\${task.description || ''}\n\n**AI Implementation Plan:**\n\${generatedChecklist}\`.trim();
+      const newDescription = `${task.description || ''}\n\n**AI Implementation Plan:**\n${generatedChecklist}`.trim();
       
       // Update local state
       setTasks(tasks.map(t => t.id === task.id ? { ...t, description: newDescription } : t));
@@ -110,8 +110,8 @@ export const KanbanDashboard: React.FC = () => {
     const colTasks = tasks.filter(t => t.status === status);
     
     return (
-      <div className={\`flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm h-full\`}>
-        <div className={\`flex items-center gap-2 p-4 border-b border-gray-100 \${bgColor}\`}>
+      <div className={`flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm h-full`}>
+        <div className={`flex items-center gap-2 p-4 border-b border-gray-100 ${bgColor}`}>
           {icon}
           <h3 className="font-semibold text-gray-800">{title}</h3>
           <span className="ml-auto bg-white/60 text-gray-600 text-xs py-0.5 px-2 rounded-full font-medium">
@@ -201,7 +201,7 @@ export const KanbanDashboard: React.FC = () => {
         <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
           <div 
             className="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-1000 ease-out"
-            style={{ width: \`\${progressPercent}%\` }}
+            style={{ width: `${progressPercent}%` }}
           ></div>
         </div>
       </div>

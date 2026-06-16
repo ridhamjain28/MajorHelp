@@ -169,7 +169,7 @@ export const ProjectArchitect: React.FC = () => {
             {proposals.map((prop, idx) => (
               <div 
                 key={idx} 
-                className={\`flex flex-col p-6 rounded-xl border-2 transition-all cursor-pointer \${selectedIdx === idx ? 'border-blue-500 bg-blue-50/30 shadow-md' : 'border-gray-200 hover:border-blue-300 hover:shadow-sm bg-white'}\`}
+                className={`flex flex-col p-6 rounded-xl border-2 transition-all cursor-pointer ${selectedIdx === idx ? 'border-blue-500 bg-blue-50/30 shadow-md' : 'border-gray-200 hover:border-blue-300 hover:shadow-sm bg-white'}`}
                 onClick={() => handleSelectProposal(idx)}
               >
                 <div className="flex justify-between items-start mb-4">
@@ -196,7 +196,7 @@ export const ProjectArchitect: React.FC = () => {
                 </div>
                 
                 <button 
-                  className={\`mt-6 w-full py-2 rounded-md font-medium text-sm transition-colors \${selectedIdx === idx ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}\`}
+                  className={`mt-6 w-full py-2 rounded-md font-medium text-sm transition-colors ${selectedIdx === idx ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                 >
                   {selectedIdx === idx ? 'Selected' : 'Select Project'}
                 </button>
