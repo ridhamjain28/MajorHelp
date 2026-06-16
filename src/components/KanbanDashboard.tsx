@@ -92,7 +92,7 @@ export const KanbanDashboard: React.FC = () => {
   const completedTasks = tasks.filter(t => t.status === 'done').length;
   const progressPercent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
-  const renderColumn = (status: Task['status'], title: string, icon: React.ReactNode, borderColor: string, iconColor: string) => {
+  const renderColumn = (status: Task['status'], title: string, icon: React.ReactNode, iconColor: string) => {
     const colTasks = tasks.filter(t => t.status === status);
     
     return (
@@ -189,9 +189,9 @@ export const KanbanDashboard: React.FC = () => {
 
       {/* Kanban Board */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[750px]">
-        {renderColumn('todo', 'To Do', <Circle className="w-5 h-5" />, 'border-zinc-500', 'text-zinc-500')}
-        {renderColumn('in_progress', 'In Progress', <PlayCircle className="w-5 h-5" />, 'border-indigo-500', 'text-indigo-500')}
-        {renderColumn('done', 'Done', <CheckCircle className="w-5 h-5" />, 'border-emerald-500', 'text-emerald-500')}
+        {renderColumn('todo', 'To Do', <Circle className="w-5 h-5" />, 'text-zinc-500')}
+        {renderColumn('in_progress', 'In Progress', <PlayCircle className="w-5 h-5" />, 'text-indigo-500')}
+        {renderColumn('done', 'Done', <CheckCircle className="w-5 h-5" />, 'text-emerald-500')}
       </div>
     </div>
   );
