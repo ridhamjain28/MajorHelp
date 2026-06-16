@@ -43,18 +43,17 @@ export const TeamManager: React.FC = () => {
     
     setCreating(true);
     try {
-      const { data, error } = await supabase
+      const newTeamId = crypto.randomUUID();
+      const { error } = await supabase
         .from('teams')
-        .insert({ name: newTeamName })
-        .select()
-        .single();
+        .insert({ id: newTeamId, name: newTeamName });
         
       if (error) throw error;
-      if (data) {
-        setTeams([...teams, data]);
-        setNewTeamName('');
-        setActiveTeamId(data.id);
-      }
+      
+      const newTeam = { id: newTeamId, name: newTeamName };
+      setTeams([...teams, newTeam]);
+      setNewTeamName('');
+      setActiveTeamId(newTeam.id);
     } catch (err: any) {
       console.error('Failed to create team:', err);
       alert('Failed to create team. Error: ' + (err?.message || JSON.stringify(err)));
