@@ -3,13 +3,16 @@ import { ProjectArchitect } from './components/ProjectArchitect';
 import { KanbanDashboard } from './components/KanbanDashboard';
 import { Auth } from './components/Auth';
 import { TeamManager } from './components/TeamManager';
+import { TeamChat } from './components/TeamChat';
+import { DocumentSpace } from './components/DocumentSpace';
+import { TeamSettings } from './components/TeamSettings';
 import { useStore } from './store/useStore';
 import { supabase } from './lib/supabase';
-import { LayoutDashboard, Wand2, LogOut, Users } from 'lucide-react';
+import { LayoutDashboard, Wand2, LogOut, Users, FileText } from 'lucide-react';
 import './App.css'; 
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'kanban' | 'architect'>('kanban');
+  const [activeTab, setActiveTab] = useState<'kanban' | 'architect' | 'documents'>('kanban');
   const user = useStore(state => state.user);
   const setUser = useStore(state => state.setUser);
   const activeTeamId = useStore(state => state.activeTeamId);
@@ -112,17 +115,24 @@ function App() {
         </header>
         
         {/* Navigation Tabs */}
-        <div className="flex gap-2 p-1 mb-10 bg-zinc-900/50 border border-zinc-800/60 rounded-xl w-fit backdrop-blur-sm">
+        <div className="flex gap-2 p-1 mb-10 bg-zinc-900/50 border border-zinc-800/60 rounded-xl w-fit backdrop-blur-sm overflow-x-auto">
           <button
             onClick={() => setActiveTab('kanban')}
-            className={`flex items-center gap-2 py-2 px-5 rounded-lg font-medium text-sm transition-all ${activeTab === 'kanban' ? 'bg-zinc-800 shadow-sm text-zinc-100' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}
+            className={`flex items-center gap-2 py-2 px-5 rounded-lg font-medium text-sm transition-all whitespace-nowrap ${activeTab === 'kanban' ? 'bg-zinc-800 shadow-sm text-zinc-100' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}
           >
             <LayoutDashboard className="w-4 h-4" />
             Dashboard
           </button>
           <button
+            onClick={() => setActiveTab('documents')}
+            className={`flex items-center gap-2 py-2 px-5 rounded-lg font-medium text-sm transition-all whitespace-nowrap ${activeTab === 'documents' ? 'bg-zinc-800 shadow-sm text-zinc-100' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}
+          >
+            <FileText className="w-4 h-4" />
+            Context Space
+          </button>
+          <button
             onClick={() => setActiveTab('architect')}
-            className={`flex items-center gap-2 py-2 px-5 rounded-lg font-medium text-sm transition-all ${activeTab === 'architect' ? 'bg-zinc-800 shadow-sm text-zinc-100' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}
+            className={`flex items-center gap-2 py-2 px-5 rounded-lg font-medium text-sm transition-all whitespace-nowrap ${activeTab === 'architect' ? 'bg-zinc-800 shadow-sm text-zinc-100' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}
           >
             <Wand2 className="w-4 h-4" />
             AI Architect
@@ -130,8 +140,14 @@ function App() {
         </div>
 
         <main>
-          {activeTab === 'kanban' ? <KanbanDashboard /> : <ProjectArchitect />}
+          {activeTab === 'kanban' && <KanbanDashboard />}
+          {activeTab === 'documents' && <DocumentSpace />}
+          {activeTab === 'architect' && <ProjectArchitect />}
         </main>
+        
+        {/* Floating Widgets */}
+        <TeamChat />
+        <TeamSettings />
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ export interface ProjectProposal {
   milestones: string[];
 }
 
-export async function generateProjectProposals(apiKey: string, phase: string, domain: string, constraints: string): Promise<ProjectProposal[]> {
+export async function generateProjectProposals(apiKey: string, phase: string, domain: string, constraints: string, context: string = ''): Promise<ProjectProposal[]> {
   const systemPrompt = `You are an expert technical project architect for engineering students.
 Given the following inputs, generate exactly 3 comprehensive project proposals tailored to their academic phase and constraints.
 
@@ -20,6 +20,7 @@ Inputs:
 - Academic Phase: ${phase}
 - Domain Interest: ${domain}
 - Constraints (Hardware/Software): ${constraints}
+${context ? `\nAdditional Context from Team Documents:\n${context}` : ''}
 `;
 
   try {

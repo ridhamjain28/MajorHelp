@@ -31,7 +31,17 @@ export const ProjectArchitect: React.FC = () => {
     setSelectedIdx(null);
 
     try {
-      const generated = await generateProjectProposals(apiKey, phase, domain, constraints);
+      // Fetch document context
+      const { data: docs } = await supabase
+        .from('documents')
+        .select('title, content')
+        .eq('team_id', activeTeamId);
+        
+      const context = docs && docs.length > 0 
+        ? docs.map(d => `Document: ${d.title}\n${d.content}`).join('\n\n') 
+        : '';
+
+      const generated = await generateProjectProposals(apiKey, phase, domain, constraints, context);
       setProposals(generated);
     } catch (err: any) {
       setError(err.message || 'Failed to generate proposals.');
