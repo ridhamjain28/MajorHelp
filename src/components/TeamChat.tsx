@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/useStore';
-import { Send, MessageSquare, Loader2, Minimize2, Maximize2 } from 'lucide-react';
+import { Send, MessageSquare, Loader2, Minimize2 } from 'lucide-react';
 
 interface Message {
   id: string;
