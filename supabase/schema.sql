@@ -58,16 +58,16 @@ CREATE POLICY "Authenticated users can create teams"
     ON public.teams FOR INSERT
     WITH CHECK (auth.uid() IS NOT NULL);
 
+-- Function to avoid infinite recursion when querying team_members
+CREATE OR REPLACE FUNCTION public.get_user_teams()
+RETURNS SETOF UUID AS $$
+  SELECT team_id FROM public.team_members WHERE user_id = auth.uid();
+$$ LANGUAGE sql SECURITY DEFINER;
+
 -- RLS Policies for team_members
 CREATE POLICY "Users can view members of their teams"
     ON public.team_members FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.team_members tm
-            WHERE tm.team_id = team_members.team_id
-            AND tm.user_id = auth.uid()
-        )
-    );
+    USING ( team_id IN (SELECT public.get_user_teams()) );
 
 -- Trigger to automatically add the creator as a team owner
 CREATE OR REPLACE FUNCTION public.handle_new_team()
